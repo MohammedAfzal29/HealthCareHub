@@ -22,7 +22,6 @@ public class Payment {
     private Double amount;
     private String paymentStatus;
     private LocalDateTime paymentDate;
-
     @OneToOne
     @JoinColumn(name = "appointment_id")
     private Appointment appointment;

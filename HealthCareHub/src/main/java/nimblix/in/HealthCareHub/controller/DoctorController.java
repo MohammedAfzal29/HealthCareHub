@@ -1,6 +1,8 @@
 package nimblix.in.HealthCareHub.controller;
 
 import lombok.RequiredArgsConstructor;
+import nimblix.in.HealthCareHub.model.Specialization;
+import nimblix.in.HealthCareHub.repository.SpecializationRepository;
 import nimblix.in.HealthCareHub.request.DoctorRegistrationRequest;
 import nimblix.in.HealthCareHub.service.DoctorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,16 +13,21 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("api/doctors")
+@RequestMapping("/api/doctors")
 @RequiredArgsConstructor
 public class DoctorController {
 
     private final DoctorService doctorService;
+    private final SpecializationRepository specializationRepository;
 
     @PostMapping("/register")
     public String registerDoctor(@RequestBody DoctorRegistrationRequest request) {
         return doctorService.registerDoctor(request);
 
+    }
+    @PostMapping("/specializations")
+    public ResponseEntity<?> saveSpecialization(@RequestBody Specialization specialization) {
+        return ResponseEntity.ok(specializationRepository.save(specialization));
     }
 
     @GetMapping("/getDoctorDetails")

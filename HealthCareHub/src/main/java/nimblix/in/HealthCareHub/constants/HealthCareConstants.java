@@ -38,4 +38,17 @@ public class HealthCareConstants {
     public static final String PRESENT = "PRESENT";
     public static final String ABSENT = "ABSENT";
     public static final String TARDY = "TARDY";
+
+    // ===== PAYMENT CONSTANTS =====
+
+    public static final String APPOINTMENT_ID_NULL = "Appointment ID cannot be null";
+    public static final String PAYMENT_ID_NULL = "Payment ID cannot be null";
+    public static final String APPOINTMENT_NOT_FOUND = "Appointment not found";
+    public static final String PAYMENT_NOT_FOUND = "Payment not found";
+    public static final String PAYMENT_NOT_ALLOWED = "Payment not allowed. Appointment already completed.";
+    public static final String INVALID_AMOUNT = "Invalid payment amount";
+    public static final String STATUS_EMPTY = "Payment status cannot be empty";
+    public static final String PAYMENT_SUCCESS = "Payment recorded successfully";
+    public static final String PAYMENT_UPDATED = "Payment status updated successfully";
+    public static final String INTERNAL_ERROR = "Internal Server Error";
 }

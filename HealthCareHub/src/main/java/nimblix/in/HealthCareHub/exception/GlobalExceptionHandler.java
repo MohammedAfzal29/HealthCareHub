@@ -1,5 +1,6 @@
 package nimblix.in.HealthCareHub.exception;
 
+import nimblix.in.HealthCareHub.constants.HealthCareConstants;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -12,47 +13,59 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 404 - Resource not found
+    // 404 - User not found
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFoundException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", HttpStatus.NOT_FOUND.value());
-        response.put("error", "Not Found");
-        response.put("message", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    // 404 - Admin not found
     @ExceptionHandler(AdminNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleAdminNotFound(UserNotFoundException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", HttpStatus.NOT_FOUND.value());
-        response.put("error", "Not Found");
-        response.put("message", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    public ResponseEntity<Map<String, Object>> handleAdminNotFound(AdminNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    // PaymentException handling
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<Map<String, Object>> handlePaymentException(PaymentException ex) {
 
-    // 400 - Bad request (invalid inputs)
+        if (ex.getMessage().equals(HealthCareConstants.APPOINTMENT_NOT_FOUND) ||
+                ex.getMessage().equals(HealthCareConstants.PAYMENT_NOT_FOUND)) {
+
+            return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        }
+
+        if (ex.getMessage().equals(HealthCareConstants.PAYMENT_NOT_ALLOWED)) {
+            return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
+        }
+
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    // 400 - Other bad requests
     @ExceptionHandler({
             IllegalArgumentException.class,
-            PaymentException.class,
             MissingServletRequestParameterException.class
     })
     public ResponseEntity<Map<String, Object>> handleBadRequest(Exception ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Bad Request");
-        response.put("message", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
-    // 500 - Generic / fallback exception
+    // 500 - Generic fallback
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                HealthCareConstants.INTERNAL_ERROR);
+    }
+
+    // Common Response Builder
+    private ResponseEntity<Map<String, Object>> buildResponse(HttpStatus status, String message) {
+
         Map<String, Object> response = new HashMap<>();
-        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        response.put("error", "Internal Server Error");
-        response.put("message", ex.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        response.put("status", status.value());
+        response.put("error", status.getReasonPhrase());
+        response.put("message", message);
+
+        return new ResponseEntity<>(response, status);
     }
 }
